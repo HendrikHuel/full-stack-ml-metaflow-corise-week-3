@@ -1,13 +1,15 @@
-from metaflow import FlowSpec, step, card, conda
+from metaflow import FlowSpec, step, card, conda, conda_base
 import json
 
+
+@conda_base(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
 class Branch_Flow_Cloud(FlowSpec):
     """
     train multiple tree based methods
     """
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
-    @card(type="corise")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    @card
     @step
     def start(self):
         """
@@ -22,7 +24,7 @@ class Branch_Flow_Cloud(FlowSpec):
         self.y = self.iris["target"]
         self.next(self.rf_model, self.xt_model, self.dt_model)
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @step
     def rf_model(self):
         """
@@ -37,7 +39,7 @@ class Branch_Flow_Cloud(FlowSpec):
         self.scores = cross_val_score(self.clf, self.X, self.y, cv=5)
         self.next(self.choose_model)
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @step
     def xt_model(self):
         """
@@ -53,7 +55,7 @@ class Branch_Flow_Cloud(FlowSpec):
         self.scores = cross_val_score(self.clf, self.X, self.y, cv=5)
         self.next(self.choose_model)
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @step
     def dt_model(self):
         """
@@ -70,7 +72,7 @@ class Branch_Flow_Cloud(FlowSpec):
 
         self.next(self.choose_model)
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @step
     def choose_model(self, inputs):
         """
@@ -85,7 +87,7 @@ class Branch_Flow_Cloud(FlowSpec):
         self.model = self.results[0][0]
         self.next(self.end)
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @step
     def end(self):
         """

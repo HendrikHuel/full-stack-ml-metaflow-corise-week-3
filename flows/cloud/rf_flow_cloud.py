@@ -2,13 +2,13 @@ from metaflow import FlowSpec, step, card, conda, conda_base
 import json
 
 
-# @conda_base(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+@conda_base(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
 class RF_Flow_cloud(FlowSpec):
     """
     train a random forest
     """
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @card(type="corise")
     @step
     def start(self):
@@ -24,7 +24,7 @@ class RF_Flow_cloud(FlowSpec):
         self.y = self.iris["target"]
         self.next(self.rf_model)
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @step
     def rf_model(self):
         """
@@ -37,7 +37,7 @@ class RF_Flow_cloud(FlowSpec):
         )
         self.next(self.train)
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @step
     def train(self):
         """
@@ -48,7 +48,7 @@ class RF_Flow_cloud(FlowSpec):
         self.scores = cross_val_score(self.clf, self.X, self.y, cv=5)
         self.next(self.end)
 
-    @conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
+    #@conda(libraries={"scikit-learn": "1.1.1"}, python="3.10.10")
     @step
     def end(self):
         """

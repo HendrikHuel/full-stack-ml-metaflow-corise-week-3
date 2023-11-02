@@ -30,7 +30,7 @@ class TaxiFarePrediction(FlowSpec):
     @step
     def transform_features(self):
         """Clean data."""
-        from project.utils.preprocessing import clean_data
+        from utils.preprocessing import clean_data
 
         self.df = clean_data(self.df)
 
@@ -58,7 +58,7 @@ class TaxiFarePrediction(FlowSpec):
 
         self.scores = cross_val_score(self.model, self.X, self.y, cv=5)
 
-        is_even = [0, 1]
+        self.is_even = [0, 1]
 
         self.next(self.train_models_on_subsets, foreach="is_even")
 
@@ -74,12 +74,13 @@ class TaxiFarePrediction(FlowSpec):
         
         import numpy as np
         from sklearn.metrics import mean_absolute_error
-
+        
         self.mode = self.input
+        self._name = f"Segment_{self.mode}"
         mask = np.round(self.X, 0) == self.mode
 
-        self.X_mod = self.X[mask]
-        self.y_mod = self.y[mask]
+        self.X_mod = self.X[mask].reshape(-1, 1)
+        self.y_mod = self.y[mask.flatten()]
 
         self.model_sub = self.model
         self.model_sub.fit(self.X_mod, self.y_mod)
@@ -96,9 +97,12 @@ class TaxiFarePrediction(FlowSpec):
         import numpy as np
 
         def score(inp):
-            return inp.model_sub, inp.mode, inp.scores
+            if not inp.train_of_seg_model_failed:
+                return inp._name, inp.mode, inp.score
+            else: 
+                return inp._name, inp.mode, -999
             
-        self.results = sorted([score(inp) if not inp.train_of_seg_model_failed else [None] * 2 + [-999] for inp in inputs], key=lambda x: -x[2])
+        self.results = sorted([score(inp) for inp in inputs], key=lambda x: -x[-1])
         self.next(self.end)
         
     @step
@@ -107,7 +111,7 @@ class TaxiFarePrediction(FlowSpec):
         End of flow!
         """
         print('Scores:')
-        print('\n'.join('%s %f %f' % res for res in self.results))
+        print('\n'.join(["{}: Mode {:.0f} - MAE {:.2f}".format(*res) for res in self.results]))
 
 
 if __name__ == "__main__":

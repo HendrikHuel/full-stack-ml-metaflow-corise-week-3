@@ -19,6 +19,8 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
         # TIP: Don't spend too much time on this step for this project though, it practice it is a never-ending process.
     ]
 
-    df = df[np.all(obviously_bad_data_filters, axis=0)]
+    np.all(obviously_bad_data_filters, axis=0)
+
+    #df = df[np.all(obviously_bad_data_filters, axis=0)]
 
     return df
